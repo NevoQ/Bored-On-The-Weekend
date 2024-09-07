@@ -29,15 +29,10 @@ public class MMDriveTrain extends SubsystemBase {
     private final CuttleMotor motorFL;
     private final CuttleMotor motorBL;
     private final CuttleMotor motorBR;
-    private final BNO055IMU imu;
     private double yawOffset = 0;
 
     public MMDriveTrain() {
         super(); //register this subsystem, in order to schedule default command later on.
-        imu = mmRobot.mmSystems.hardwareMap.get(BNO055IMU.class, Configuration.IMU);
-        BNO055IMU.Parameters imuParameters = new BNO055IMU.Parameters();
-        imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        imu.initialize(imuParameters);
 
         motorFL = new CuttleMotor(mmRobot.mmSystems.controlHub, Configuration.DRIVE_TRAIN_FRONT_LEFT);
         motorBL = new CuttleMotor(mmRobot.mmSystems.controlHub, Configuration.DRIVE_TRAIN_BACK_LEFT);
@@ -122,7 +117,7 @@ public class MMDriveTrain extends SubsystemBase {
      * @return the yaw of the robot
      */
     public double getYawInDegrees() {
-        return imu.getAngularOrientation().firstAngle + yawOffset;
+        return mmRobot.mmSystems.imu.getYawInDegrees() + yawOffset;
     }
 
     /**
@@ -130,7 +125,7 @@ public class MMDriveTrain extends SubsystemBase {
      * @param newYaw the new yaw
      */
     public void setYaw(double newYaw) {
-        yawOffset = newYaw - imu.getAngularOrientation().firstAngle;
+        yawOffset = newYaw - mmRobot.mmSystems.imu.getYawInDegrees();
     }
 
     /**
