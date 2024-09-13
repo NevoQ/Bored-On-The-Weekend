@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Libraries.MMLib.DriveTrain.Subsystem;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.geometry.Vector2d;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.roboctopi.cuttlefish.utils.Direction;
 
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -25,11 +24,7 @@ public class MMDriveTrain extends SubsystemBase {
 
     MMRobot mmRobot = MMRobot.getInstance();
 
-    private final CuttleMotor motorFR;
-    private final CuttleMotor motorFL;
-    private final CuttleMotor motorBL;
-    private final CuttleMotor motorBR;
-    private double yawOffset = 0;
+    private final CuttleMotor motorFR, motorFL, motorBL, motorBR;
 
     public MMDriveTrain() {
         super(); //register this subsystem, in order to schedule default command later on.
@@ -43,11 +38,6 @@ public class MMDriveTrain extends SubsystemBase {
         motorFL.setDirection(Direction.REVERSE);
         motorBL.setDirection(Direction.REVERSE);
 
-    }
-
-    public MMDriveTrain(double lastAngle){
-        this();
-        setYaw(lastAngle);
     }
 
     /**
@@ -90,12 +80,23 @@ public class MMDriveTrain extends SubsystemBase {
 
     }
 
+    /**
+     * updates the power to the motors.
+     * @param power the power array to feed to the motor.
+     */
     private void setMotorPower(double[] power) {
         motorFL.setPower(power[0]);
         motorBL.setPower(power[1]);
         motorFR.setPower(power[2]);
         motorBR.setPower(power[3]);
     }
+
+    /**
+     * normal (non-field-oriented) arcade drive
+     * @param x the value on the x axis
+     * @param y the value on the y axis
+     * @param yaw the value on the yaw axis
+     */
     public void drive(double x, double y, double yaw) {
         setMotorPower(joystickToPower(x, y, yaw));
     }
@@ -108,31 +109,8 @@ public class MMDriveTrain extends SubsystemBase {
      */
     public void fieldOrientedDrive(double x, double y, double yaw) {
         Vector2d joystickDirection = new Vector2d(x, y);
-        Vector2d fieldOrientedVector = joystickDirection.rotateBy(-getYawInDegrees());
+        Vector2d fieldOrientedVector = joystickDirection.rotateBy(-mmRobot.mmSystems.imu.getYawInDegrees());
         drive(fieldOrientedVector.getX(), fieldOrientedVector.getY(), yaw);
-    }
-
-    /**
-     * this method returns the yaw of the robot, while respecting a certain offset.
-     * @return the yaw of the robot
-     */
-    public double getYawInDegrees() {
-        return mmRobot.mmSystems.imu.getYawInDegrees() + yawOffset;
-    }
-
-    /**
-     * set a new yaw to the robot
-     * @param newYaw the new yaw
-     */
-    public void setYaw(double newYaw) {
-        yawOffset = newYaw - mmRobot.mmSystems.imu.getYawInDegrees();
-    }
-
-    /**
-     * reset the yaw of the robot (reset field oriented drive)
-     */
-    public void resetYaw() {
-        setYaw(0);
     }
 
 }

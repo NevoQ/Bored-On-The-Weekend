@@ -8,6 +8,7 @@ import com.qualcomm.hardware.adafruit.AdafruitBNO055IMUNew;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.BNO055IMUNew;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
@@ -67,7 +68,12 @@ public class MMSystems {
         this.gamepadEx2 = new GamepadEx(gamepad2);
         this.telemetry = telemetry;
         this.battery = new MMBattery(hardwareMap);
-        this.imu = new MMIMU<>(BNO055IMUNew.class);
+        this.imu = new MMIMU<>(
+                BNO055IMUNew.class,
+                hardwareMap,
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP
+        );
         CommandScheduler.getInstance().reset(); //reset the scheduler
     }
 
